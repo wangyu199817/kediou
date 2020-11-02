@@ -2,6 +2,7 @@ package com.zgx.tkmybatis;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -21,9 +22,8 @@ import static javax.persistence.TemporalType.DATE;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class BaseEntity implements Serializable {
-    @Id
-    private String id;
 
     @Temporal(DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

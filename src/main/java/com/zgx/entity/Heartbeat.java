@@ -1,12 +1,15 @@
 package com.zgx.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.zgx.tkmybatis.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Temporal;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import static javax.persistence.TemporalType.DATE;
@@ -17,7 +20,8 @@ import static javax.persistence.TemporalType.DATE;
  **/
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class Heartbeat  extends BaseEntity {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Heartbeat  implements Serializable {
     //[必须]设备类型,如"IPC","VMS","NVR","IVR".
     private String DevType;
     //[可选]管理域中可唯一标识.
