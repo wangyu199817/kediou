@@ -1,0 +1,139 @@
+group 'com.zgx'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext {
+        // 定义变量
+        springBootVersion = '2.0.1.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+
+allprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+
+    configurations {
+        compile.exclude module: "undertow-websockets-jsr"
+
+
+        developmentOnly
+        runtimeClasspath {
+            extendsFrom developmentOnly
+        }
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+
+
+//这里一定得要。在多模块下，不然编译失败，因为不会把信赖模块给打包。
+    jar {
+        enabled = true
+    }
+
+
+
+    repositories {
+        maven {
+            url 'http://maven.aliyun.com/nexus/content/groups/public/'
+        }
+
+        jcenter()
+        mavenCentral()
+    }
+
+    //指定编码格式
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+
+
+
+    dependencies {
+
+
+        //compile group: 'javax', name: 'javaee-api', version: '8.0'
+        compile 'org.eclipse:yasson:1.0'
+        compile group: 'org.glassfish', name: 'javax.json', version: '1.1.2'
+        //compile group: 'org.glassfish', name: 'json', version: '1.1'
+
+        //springframework
+        compile('org.springframework.boot:spring-boot-starter')
+        compile('org.springframework.boot:spring-boot-starter-web')
+        compile('org.springframework.boot:spring-boot-starter-test')
+        compile 'org.springframework.boot:spring-boot-starter-aop'
+        //undertow
+        //shiro
+        compile 'org.apache.shiro:shiro-spring:1.4.0'
+        compile 'org.apache.shiro:shiro-ehcache:1.4.0'
+
+        compile 'org.springframework.boot:spring-boot-starter-undertow'
+        compile "io.undertow:undertow-core:2.0.13.Final"
+        compile "io.undertow:undertow-servlet:2.0.13.Final"
+        //lombok
+        annotationProcessor 'org.projectlombok:lombok:1.18.2'
+        compileOnly 'org.projectlombok:lombok:1.18.2'
+        //database
+        compile 'com.alibaba:druid-spring-boot-starter:1.1.10'
+        compile 'org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.2'
+        compile 'org.mybatis:mybatis-typehandlers-jsr310:1.0.2'
+        compile 'tk.mybatis:mapper-spring-boot-starter:2.0.4'
+        compile 'joda-time:joda-time:2.9.9'
+//        //spring集成redis、quartz、kafka等
+//        compile 'org.springframework.boot:spring-boot-starter-data-redis'
+//        compile 'org.springframework.boot:spring-boot-starter-quartz'
+//        compile 'org.springframework.boot:spring-boot-starter-mail'
+        // https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka
+//        compile group: 'org.springframework.kafka', name: 'spring-kafka'
+
+        //swagger
+        compile 'io.springfox:springfox-swagger2:2.9.2'
+        compile 'io.springfox:springfox-swagger-ui:2.9.2'
+        //工具类,fastjson、jwt等
+        compile 'com.alibaba:fastjson:1.2.49'
+        compile group: 'org.json', name: 'json', version: '20141113'
+        compile 'io.jsonwebtoken:jjwt:0.9.1'
+        // https://mvnrepository.com/artifact/com.xiaoleilu/hutool-all
+        compile group: 'com.xiaoleilu', name: 'hutool-all', version: '3.3.2'
+        compile 'org.apache.commons:commons-lang3:3.8'
+        runtime 'org.apache.commons:commons-pool2:2.6.0'
+        compile 'commons-io:commons-io:2.6'
+        compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.8'
+        //分页
+        compile 'com.github.pagehelper:pagehelper-spring-boot-starter:1.2.3'
+        //poi
+        compile 'org.apache.poi:poi:3.17'
+        compile 'org.apache.poi:poi-ooxml:3.17'
+        compile 'commons-beanutils:commons-beanutils:1.9.4'
+
+        runtime 'mysql:mysql-connector-java'
+        compile 'cn.teaey.apns4j:apns4j:1.1.4'
+
+        compile 'io.netty:netty-handler:4.1.35.Final'
+        compile 'io.netty:netty-buffer:4.1.35.Final'
+        compile 'io.netty:netty-codec:4.1.35.Final'
+        compile 'io.netty:netty-codec-http:4.1.35.Final'
+        compile 'io.netty:netty-common:4.1.35.Final'
+        compile 'io.netty:netty-transport:4.1.35.Final'
+        compile 'com.google.protobuf:protobuf-java:3.7.0'
+        compile files('lib/cmcciot-sdk-1.0.jar')
+        compile files('lib/OceanSDK-1.0.jar')
+
+
+
+    }
+}

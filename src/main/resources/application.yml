@@ -1,0 +1,29 @@
+server:
+  port: 8099
+
+
+#自定义连接url地址
+#kediou:
+#  url: http://192.168.1.188:304
+
+
+
+
+
+
+
+
+
+#配置通用tk mapper
+mapper:
+  mappers:
+    - com.zgx.tkmybatis.MyMapper
+  not-empty: false
+  identity: MYSQL
+
+#分页插件
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
