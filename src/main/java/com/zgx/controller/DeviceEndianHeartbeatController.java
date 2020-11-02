@@ -45,15 +45,17 @@ public class DeviceEndianHeartbeatController implements IBaseController {
         String devName = request.getParameter("DevName");
         String serialNum = request.getParameter("SerialNum");
         String localTime = request.getParameter("LocalTime");
-        Integer reportCount = Integer.valueOf(request.getParameter("ReportCount"));
+        String reportCount = request.getParameter("ReportCount");
         Heartbeat heartbeat=new Heartbeat();
         heartbeat.setDevType(devType);
         heartbeat.setDevName(devName);
         heartbeat.setLocalTime(localTime);
         heartbeat.setSerialNum(serialNum);
-        heartbeat.setReportCount(reportCount);
+//        heartbeat.setReportCount(reportCount);
+        log.info("request is {}",request);
+//        log.info("response is {}",response);
         log.info("heartbeat is {}",heartbeat);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(heartbeat);
     }
 
     @PostMapping(value = "/DeviceEndianEvent")

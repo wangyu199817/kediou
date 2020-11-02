@@ -21,6 +21,5 @@ public class Event extends BaseEntity {
     private String EventType;
     private Integer OriginW;
     private Integer OriginH;
-    private Long Id;
 
 }
