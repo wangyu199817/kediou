@@ -52,8 +52,7 @@ public class DeviceEndianHeartbeatController implements IBaseController {
         heartbeat.setLocalTime(localTime);
         heartbeat.setSerialNum(serialNum);
         heartbeat.setReportCount(reportCount);
-
-//        log.info("heartbeat is {}",heartbeat);
+        log.info("heartbeat is {}",heartbeat);
         return ResponseEntity.ok(response);
     }
 
