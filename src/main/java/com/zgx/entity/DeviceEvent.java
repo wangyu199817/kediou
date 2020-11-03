@@ -1,12 +1,9 @@
 package com.zgx.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.zgx.tkmybatis.BaseEntity;
-import io.swagger.models.auth.In;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.io.Serializable;
-import java.util.List;
 
 
 /**
@@ -15,6 +12,7 @@ import java.util.List;
  **/
 @Data
 @EqualsAndHashCode(callSuper = false)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeviceEvent extends BaseEntity {
     //[必须]设备类型,如"IPC","VMS","NVR","IVR".
     private String DevType;
@@ -34,11 +32,10 @@ public class DeviceEvent extends BaseEntity {
     //"Person"表示下文包含"PersonInfo"字段.
     //“EBike”表示下文包含”EBikeInfo”字段.
     private String EventType;
-    //"OriginW","OriginH", 是检测的原始图像的宽高
-    private Integer OriginW;
-    private Integer OriginH;
 
-    private List<EBikeInfo> eBikeInfo;
-
+    private EBike EBikeInfo;
+    private OverAllImage OverallImageInfo;
+    //报警消息
+    private Alarm AlarmInfo;
 
 }

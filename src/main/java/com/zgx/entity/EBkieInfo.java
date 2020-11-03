@@ -5,13 +5,16 @@ import com.zgx.tkmybatis.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 import java.util.Map;
 
+/**
+ * @author: WY
+ * @create: 2020/11/3
+ **/
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class EBikeInfo extends BaseEntity {
+public class EBkieInfo extends BaseEntity {
     //检测区域号 支持4个区域 范围 0~3
     private Integer RegionId;
     //编号
@@ -21,5 +24,4 @@ public class EBikeInfo extends BaseEntity {
     private String ObjType;
     //子类型, Bicycle-自行车, Motorbike-电动车
     private String SubObjType;
-
 }
