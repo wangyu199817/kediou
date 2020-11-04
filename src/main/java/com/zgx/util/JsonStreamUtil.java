@@ -1,19 +1,14 @@
-package com.zgx.common.util;
+package com.zgx.util;
 
 import com.alibaba.fastjson.JSONObject;
-import com.oracle.jrockit.jfr.EventInfo;
-import com.zgx.entity.DeviceEvent;
-import com.zgx.entity.Heartbeat;
-import com.zgx.entity.ResponseInfo;
-import org.apache.http.HttpResponse;
-import org.springframework.http.ResponseEntity;
+import com.zgx.model.ResponseInfo;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 
-public class StreamUtil {
+public class JsonStreamUtil {
     public static String getRequestStringFromJson(HttpServletRequest request) {
         BufferedReader reader = null;
         try {
@@ -41,7 +36,6 @@ public class StreamUtil {
         } catch (IOException e) {
             return null;
         }
-
     }
 
     public static void getResponsePrintWriter(ResponseInfo responseInfo, HttpServletResponse response) {

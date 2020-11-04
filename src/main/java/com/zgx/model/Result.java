@@ -1,4 +1,4 @@
-package com.zgx.entity;
+package com.zgx.model;
 
 /**
  * http请求返回的最外层对象

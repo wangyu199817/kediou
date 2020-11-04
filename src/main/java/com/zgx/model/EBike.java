@@ -1,13 +1,11 @@
-package com.zgx.entity;
+package com.zgx.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.zgx.tkmybatis.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = false)

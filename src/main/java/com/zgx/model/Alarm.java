@@ -1,4 +1,4 @@
-package com.zgx.entity;
+package com.zgx.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.zgx.tkmybatis.BaseEntity;

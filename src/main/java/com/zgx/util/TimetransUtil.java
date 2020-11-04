@@ -1,4 +1,4 @@
-package com.zgx.common.util;
+package com.zgx.util;
 
 
 import org.joda.time.DateTime;
@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 
-public class DateUtil {
+public class TimetransUtil {
 
     /**
      * 传入String类型日期(ISO8601标准时间:yyyy-MM-dd'T'HH:mm:ss.SSS'Z')，返回字符串类型时间(yyyy-MM-dd HH:mm:ss)
@@ -56,9 +56,9 @@ public class DateUtil {
 
     public static void main(String[] args) {
         String t="19961220T003957Z";
-        System.out.println("DateUtil.getDateStrFromISO8601Timestamp(t):"+ DateUtil.getDateStrFromISO8601Timestamp(t));
+        System.out.println("DateUtil.getDateStrFromISO8601Timestamp(t):"+ TimetransUtil.getDateStrFromISO8601Timestamp(t));
         System.out.println(LocalDateTime.now());
-        String s=DateUtil.getISO8601TimestampFromDate(LocalDateTime.now());
+        String s=TimetransUtil.getISO8601TimestampFromDate(LocalDateTime.now());
         System.out.println("s:"+s);
 
     }

@@ -2,6 +2,10 @@ server:
   port: 8099
 
 
+picture:
+  url:  d:\\AlarmPicture
+
+
 #自定义连接url地址
 #kediou:
 #  url: http://192.168.1.188:304

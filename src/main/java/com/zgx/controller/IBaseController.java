@@ -2,7 +2,7 @@ package com.zgx.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zgx.common.ResultEnum;
-import com.zgx.entity.Result;
+import com.zgx.model.Result;
 
 import static com.zgx.common.ResultEnum.ERROR_CODE;
 import static com.zgx.common.ResultEnum.SUCESS_CODE;
