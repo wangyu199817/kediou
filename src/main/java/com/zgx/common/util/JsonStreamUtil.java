@@ -1,4 +1,4 @@
-package com.zgx.util;
+package com.zgx.common.util;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zgx.model.ResponseInfo;

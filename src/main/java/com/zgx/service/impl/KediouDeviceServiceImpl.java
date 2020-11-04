@@ -1,8 +1,11 @@
 package com.zgx.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.zgx.common.util.JsonStreamUtil;
+import com.zgx.common.util.TimetransUtil;
 import com.zgx.model.DeviceEvent;
-import com.zgx.util.*;
 import com.zgx.model.Heartbeat;
 import com.zgx.model.ResponseInfo;
 import com.zgx.service.IKediouDeviceService;
@@ -10,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -35,9 +39,16 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
     @Resource
     private HttpServletResponse response;
 
+    @Resource
+    private RestTemplate restTemplate;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Value("${picture.url}")
     private String path;
 
+    @Value("operation.serverport")
+    private String serverPort;
     /**
      * 服务端接收设备传递心跳传递信息处理
      */
@@ -47,6 +58,10 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
         JSONObject requestJson = JSONObject.parseObject(requestStringFromJson);
         Heartbeat heartbeat = requestJson.toJavaObject(Heartbeat.class);
         heartbeat.setLocalTime(TimetransUtil.getDateStrFromISO8601Timestamp(heartbeat.getLocalTime()));
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("serialNum", heartbeat.getSerialNum());
+        objectNode.put("heartSendTime", heartbeat.getLocalTime());
+        restTemplate.postForObject(serverPort+"/camera/online", objectNode, JSONObject.class);
         log.info(" heartbeat is {}", heartbeat);
         ResponseInfo responseInfo = new ResponseInfo();
         responseInfo.setReturnCode(0);
@@ -57,15 +72,10 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
         JsonStreamUtil.getResponsePrintWriter(responseInfo, response);
     }
 
-    /**
-     * 服务器接收设备传递的事件消息处理
-     *
-     * @param EventInfo 事件json文本文件
-     * @param file      图片文件
-     */
     @Override
     public void DeviceEndianEvent(MultipartFile EventInfo, MultipartFile file) {
         String EventInfoStr = JsonStreamUtil.readFiletoString(EventInfo);
+        log.info("EventInfoStr is {}", EventInfoStr);
         DeviceEvent deviceEvent = JSONObject.parseObject(EventInfoStr, DeviceEvent.class);
         log.info("deviceEvent is {}", deviceEvent);
         if (null != file) {
@@ -75,7 +85,7 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
             if (beginIndex > 0) {
                 suffix = originalFilename.substring(beginIndex);
             }
-            String filename = UUID.randomUUID().toString()+ suffix;
+            String filename = UUID.randomUUID().toString() + suffix;
             File dest = new File(path, filename);
             try {
                 file.transferTo(dest);
@@ -87,4 +97,5 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
         responseInfo.setReturnCode(0);
         JsonStreamUtil.getResponsePrintWriter(responseInfo, response);
     }
+
 }

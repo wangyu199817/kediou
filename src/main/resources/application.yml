@@ -1,6 +1,8 @@
 server:
   port: 8099
 
+operation:
+  serverport: localhost:8086
 
 picture:
   url:  d:\\AlarmPicture

@@ -1,10 +1,12 @@
 package com.zgx.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zgx.service.IKediouDeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -19,6 +21,11 @@ public class KediouDeviceController implements IBaseController {
 
     @Resource
     private IKediouDeviceService kediouDeviceService;
+
+    @Resource
+    private RestTemplate restTemplate;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * 服务端接收设备传递心跳传递信息处理
@@ -46,5 +53,6 @@ public class KediouDeviceController implements IBaseController {
             log.error("getDeviceEndianEvent error is {}", e);
         }
     }
+
 
 }

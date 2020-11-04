@@ -1,4 +1,4 @@
-package com.zgx.util;
+package com.zgx.common.util;
 
 
 import org.joda.time.DateTime;
@@ -15,15 +15,20 @@ public class TimetransUtil {
     /**
      * 传入String类型日期(ISO8601标准时间:yyyy-MM-dd'T'HH:mm:ss.SSS'Z')，返回字符串类型时间(yyyy-MM-dd HH:mm:ss)
      *
-     * @param ISOdate
      * @return
      */
-    public static String getDateStrFromISO8601Timestamp(String ISOdate) {
+    public static String getDateStrFromISO8601Timestamp(String timeStr) {
         DateTimeFormatter dtf1 = DateTimeFormat.forPattern("yyyyMMdd'T'HHmmssZ");
-        DateTime dt = dtf1.parseDateTime(ISOdate);
+        DateTime dt = dtf1.parseDateTime(timeStr);
         DateTimeFormatter dtf2 = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 
         return dt.toString(dtf2);
+    }
+
+    public static LocalDateTime getLocalDateTimeFromStr(String ISOdate) {
+        java.time.format.DateTimeFormatter dateTimeFormatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime localDateTime=LocalDateTime.parse(ISOdate,dateTimeFormatter);
+        return localDateTime;
     }
 
     /**
@@ -55,12 +60,13 @@ public class TimetransUtil {
 
 
     public static void main(String[] args) {
-        String t="19961220T003957Z";
-        System.out.println("DateUtil.getDateStrFromISO8601Timestamp(t):"+ TimetransUtil.getDateStrFromISO8601Timestamp(t));
-        System.out.println(LocalDateTime.now());
-        String s=TimetransUtil.getISO8601TimestampFromDate(LocalDateTime.now());
-        System.out.println("s:"+s);
-
+        String t = "19961220T003957Z";
+        System.out.println("DateUtil.getDateStrFromISO8601Timestamp(t):" + TimetransUtil.getDateStrFromISO8601Timestamp(t));
+        System.out.println("localdatetime:" + LocalDateTime.now());
+        String s = TimetransUtil.getISO8601TimestampFromDate(LocalDateTime.now());
+        System.out.println("getISO8601TimestampFromDate:" + s);
+        LocalDateTime dateFromISO8601TimeStr = TimetransUtil.getLocalDateTimeFromStr("2020-11-04 15:38:48");
+        System.out.println("dateFromISO8601TimeStr:" + dateFromISO8601TimeStr);
     }
 
 }
