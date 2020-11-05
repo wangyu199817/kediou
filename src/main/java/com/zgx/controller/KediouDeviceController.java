@@ -1,15 +1,19 @@
 package com.zgx.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zgx.model.MonitorAlarm;
 import com.zgx.service.IKediouDeviceService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * @author: WY
@@ -22,10 +26,8 @@ public class KediouDeviceController implements IBaseController {
     @Resource
     private IKediouDeviceService kediouDeviceService;
 
-    @Resource
-    private RestTemplate restTemplate;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Value("${picture.url}")
+    private String path;
 
     /**
      * 服务端接收设备传递心跳传递信息处理
@@ -46,12 +48,37 @@ public class KediouDeviceController implements IBaseController {
      * @param file      图片文件
      */
     @PostMapping(value = "/DeviceEndianEvent")
-    public void getDeviceEndianEvent(MultipartFile EventInfo, MultipartFile file) {
+    public void getDeviceEndianEvent(HttpServletRequest request1,MultipartFile EventInfo, MultipartFile file) {
         try {
             kediouDeviceService.DeviceEndianEvent(EventInfo, file);
         } catch (Exception e) {
             log.error("getDeviceEndianEvent error is {}", e);
         }
+    }
+
+    @PostMapping("/camera/alarm")
+    public void getAlarm(MultipartFile alarmPicture, MonitorAlarm monitorAlarm) {
+        log.info("deviceRelate is {}", monitorAlarm);
+        if (null != alarmPicture) {
+            String originalFilename = alarmPicture.getOriginalFilename();
+            String suffix = "";
+            int beginIndex = originalFilename.lastIndexOf(".");
+            if (beginIndex > 0) {
+                suffix = originalFilename.substring(beginIndex);
+            }
+            String filename = UUID.randomUUID().toString() + suffix;
+            File dest = new File(path, filename);
+            try {
+                alarmPicture.transferTo(dest);
+            } catch (IOException e) {
+                log.info("file IOException is {}", e);
+            }
+        }
+    }
+    @PostMapping("/camera/online")
+    public void  getHeartBeat(MonitorAlarm monitorAlarm) {
+        log.info("serialNum is {}", monitorAlarm.getSerialNum());
+        log.info("heartSendTime is {}", monitorAlarm.getHeartSendTime());
     }
 
 

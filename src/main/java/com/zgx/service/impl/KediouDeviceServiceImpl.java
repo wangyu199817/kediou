@@ -1,9 +1,8 @@
 package com.zgx.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zgx.common.util.JsonStreamUtil;
+import com.zgx.common.util.OkHttpUtils;
 import com.zgx.common.util.TimetransUtil;
 import com.zgx.model.DeviceEvent;
 import com.zgx.model.Heartbeat;
@@ -21,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -42,13 +43,13 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
     @Resource
     private RestTemplate restTemplate;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${picture.url}")
     private String path;
 
-    @Value("operation.serverport")
+    @Value("${operation.server}")
     private String serverPort;
+
     /**
      * 服务端接收设备传递心跳传递信息处理
      */
@@ -58,10 +59,10 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
         JSONObject requestJson = JSONObject.parseObject(requestStringFromJson);
         Heartbeat heartbeat = requestJson.toJavaObject(Heartbeat.class);
         heartbeat.setLocalTime(TimetransUtil.getDateStrFromISO8601Timestamp(heartbeat.getLocalTime()));
-        ObjectNode objectNode = objectMapper.createObjectNode();
-        objectNode.put("serialNum", heartbeat.getSerialNum());
-        objectNode.put("heartSendTime", heartbeat.getLocalTime());
-        restTemplate.postForObject(serverPort+"/camera/online", objectNode, JSONObject.class);
+        Map<String, String> params = new HashMap<>();
+        params.put("serialNum", heartbeat.getSerialNum());
+        params.put("heartSendTime", heartbeat.getLocalTime());
+        OkHttpUtils.doPost(serverPort + "/camera/online", params, null);
         log.info(" heartbeat is {}", heartbeat);
         ResponseInfo responseInfo = new ResponseInfo();
         responseInfo.setReturnCode(0);
@@ -73,13 +74,14 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
     }
 
     @Override
-    public void DeviceEndianEvent(MultipartFile EventInfo, MultipartFile file) {
+    public void DeviceEndianEvent(MultipartFile EventInfo, MultipartFile alarmPicture) {
         String EventInfoStr = JsonStreamUtil.readFiletoString(EventInfo);
-        log.info("EventInfoStr is {}", EventInfoStr);
+//        log.info("EventInfoStr is {}", EventInfoStr);
         DeviceEvent deviceEvent = JSONObject.parseObject(EventInfoStr, DeviceEvent.class);
-        log.info("deviceEvent is {}", deviceEvent);
-        if (null != file) {
-            String originalFilename = file.getOriginalFilename();
+        deviceEvent.setLocalTime(TimetransUtil.getDateStrFromISO8601Timestamp(deviceEvent.getLocalTime()));
+        log.info("DeviceEndianEvent deviceEvent is {}", deviceEvent);
+        if (null != alarmPicture) {
+            String originalFilename = alarmPicture.getOriginalFilename();
             String suffix = "";
             int beginIndex = originalFilename.lastIndexOf(".");
             if (beginIndex > 0) {
@@ -88,14 +90,37 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
             String filename = UUID.randomUUID().toString() + suffix;
             File dest = new File(path, filename);
             try {
-                file.transferTo(dest);
+                alarmPicture.transferTo(dest);
             } catch (IOException e) {
                 log.info("file IOException is {}", e);
             }
         }
+        Map<String, String> map = new HashMap<>();
+        map.put("serialNum", deviceEvent.getSerialNum());
+        map.put("alarmType", deviceEvent.getEventType());
+        map.put("alarmTime", deviceEvent.getLocalTime());
+        OkHttpUtils.doPostFile(serverPort + "/camera/alarm", null, map, "alarmPicture", alarmPicture);
         ResponseInfo responseInfo = new ResponseInfo();
         responseInfo.setReturnCode(0);
         JsonStreamUtil.getResponsePrintWriter(responseInfo, response);
+
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+//        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity(popHeaders(deviceEvent, file), headers);
+//        restTemplate.postForObject(serverPort + "/camera/alarm", entity, Object.class);
+
     }
+
+//    private MultiValuedMap<String, String> popHeaders(DeviceEvent deviceEvent, MultipartFile file) {
+//        MultiValueMap<String, String> map = new LinkedMultiValueMap();
+//        map.add("serialNum", deviceEvent.getSerialNum());
+//        map.add("alarmType", deviceEvent.getEventType());
+//        map.add("alarmTime", deviceEvent.getLocalTime());
+//        if (file != null) {
+//            map.add("alarmPicture", file);
+//        }
+//        log.info("map is {}", map);
+//        return (MultiValuedMap<String, String>) map;
+//    }
 
 }

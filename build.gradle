@@ -65,7 +65,7 @@ allprojects {
 
     dependencies {
 
-
+        compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.0.0'
         //compile group: 'javax', name: 'javaee-api', version: '8.0'
         compile 'org.eclipse:yasson:1.0'
         compile group: 'org.glassfish', name: 'javax.json', version: '1.1.2'
@@ -84,6 +84,7 @@ allprojects {
         compile 'org.springframework.boot:spring-boot-starter-undertow'
         compile "io.undertow:undertow-core:2.0.13.Final"
         compile "io.undertow:undertow-servlet:2.0.13.Final"
+        compile "com.google.code.gson:gson:2.8.6"
         //lombok
         annotationProcessor 'org.projectlombok:lombok:1.18.2'
         compileOnly 'org.projectlombok:lombok:1.18.2'
