@@ -58,7 +58,7 @@ public class KediouDeviceController implements IBaseController {
 
     @PostMapping("/camera/alarm")
     public void getAlarm(MultipartFile alarmPicture, MonitorAlarm monitorAlarm) {
-        log.info("deviceRelate is {}", monitorAlarm);
+        log.info("monitorAlarm is {}", monitorAlarm);
         if (null != alarmPicture) {
             String originalFilename = alarmPicture.getOriginalFilename();
             String suffix = "";

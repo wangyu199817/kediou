@@ -96,10 +96,16 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
             }
         }
         Map<String, String> map = new HashMap<>();
-        map.put("serialNum", deviceEvent.getSerialNum());
-        map.put("alarmType", deviceEvent.getEventType());
-        map.put("alarmTime", deviceEvent.getLocalTime());
-        OkHttpUtils.doPostFile(serverPort + "/camera/alarm", null, map, "alarmPicture", alarmPicture);
+        if(deviceEvent.getDevType().equals("EBike")){
+            deviceEvent.setDevType("电动车入电梯报警");
+            map.put("serialNum", deviceEvent.getSerialNum());
+            map.put("alarmType", deviceEvent.getEventType());
+            map.put("alarmTime", deviceEvent.getLocalTime());
+            OkHttpUtils.doPostFile(serverPort + "/camera/alarm", null, map, "alarmPicture", alarmPicture);
+
+        }
+
+
         ResponseInfo responseInfo = new ResponseInfo();
         responseInfo.setReturnCode(0);
         JsonStreamUtil.getResponsePrintWriter(responseInfo, response);

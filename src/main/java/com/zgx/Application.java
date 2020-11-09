@@ -28,13 +28,12 @@ public class Application {
         factory.setMaxRequestSize("30MB");
         // 文件临时保存目录 避免占用服务器 temp 目录
         //windows 系统下文件目录
-        File file = new File("d://temp");
-//        linux系统下文件目录
-//        File file=new File("/data/upload_tmp");
+        String path="d://tempss";
+        File file = new File(path);
         if (!file.exists()) {
             file.mkdirs();
         }
-        factory.setLocation(file.getAbsolutePath());
+        factory.setLocation(path);
         return factory.createMultipartConfig();
     }
 }

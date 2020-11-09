@@ -2,7 +2,7 @@ server:
   port: 8099
 
 operation:
-  server: http://192.168.1.11:8099
+  server: http://192.168.1.12:8099
 
 picture:
   url:  d:\\AlarmPicture
