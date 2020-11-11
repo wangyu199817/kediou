@@ -12,17 +12,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author: WY
@@ -36,19 +33,20 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
 
     @Resource
     private HttpServletRequest request;
-
     @Resource
     private HttpServletResponse response;
 
-    @Resource
-    private RestTemplate restTemplate;
-
-
     @Value("${picture.url}")
-    private String path;
+    public String path;
 
     @Value("${operation.server}")
-    private String serverPort;
+    public String serverPort;
+
+    //用于存放设备序列号和设备心跳发送时间，方便后续推送平台时上线和下线可以只调用一次接口
+    public static Map<String, LocalDateTime> isOnLineMap = new HashMap<>();
+
+    //用于存放设备告警事件和设备告警发送时间，用于阻止一直报警
+    public static Map<String, LocalDateTime> isSameMap = new HashMap<>();
 
     /**
      * 服务端接收设备传递心跳传递信息处理
@@ -60,9 +58,17 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
         Heartbeat heartbeat = requestJson.toJavaObject(Heartbeat.class);
         heartbeat.setLocalTime(TimetransUtil.getDateStrFromISO8601Timestamp(heartbeat.getLocalTime()));
         Map<String, String> params = new HashMap<>();
-        params.put("serialNum", heartbeat.getSerialNum());
-        params.put("heartSendTime", heartbeat.getLocalTime());
-        OkHttpUtils.doPost(serverPort + "/camera/online", params, null);
+        //判断摄像头的序列号是够存在 Map  isOnLineMap<K,V>中，若存在则说明设备已经上线了，只更新V的时间，不存在则发送上线通知到平台
+        if (!isOnLineMap.containsKey(heartbeat.getSerialNum())) {
+            isOnLineMap.put(heartbeat.getSerialNum(), LocalDateTime.now());
+            params.put("serialNum", heartbeat.getSerialNum());
+            params.put("heartSendTime", heartbeat.getLocalTime());
+            params.put("isOnline", "1");
+            OkHttpUtils.doPost(serverPort + "/camera/online", params, null);
+        }
+        //接收设备心跳后根据设备心跳传来的序列号 即通过K更新V的时间， 以便后续判断设备是否离线
+        isOnLineMap.put(heartbeat.getSerialNum(), LocalDateTime.now());
+        log.info("存设备于map：" + isOnLineMap);
         log.info(" heartbeat is {}", heartbeat);
         ResponseInfo responseInfo = new ResponseInfo();
         responseInfo.setReturnCode(0);
@@ -80,32 +86,33 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
         DeviceEvent deviceEvent = JSONObject.parseObject(EventInfoStr, DeviceEvent.class);
         deviceEvent.setLocalTime(TimetransUtil.getDateStrFromISO8601Timestamp(deviceEvent.getLocalTime()));
         log.info("DeviceEndianEvent deviceEvent is {}", deviceEvent);
-        if (null != alarmPicture) {
-            String originalFilename = alarmPicture.getOriginalFilename();
-            String suffix = "";
-            int beginIndex = originalFilename.lastIndexOf(".");
-            if (beginIndex > 0) {
-                suffix = originalFilename.substring(beginIndex);
-            }
-            String filename = UUID.randomUUID().toString() + suffix;
-            File dest = new File(path, filename);
-            try {
-                alarmPicture.transferTo(dest);
-            } catch (IOException e) {
-                log.info("file IOException is {}", e);
-            }
-        }
+        //保存告警摄像头抓拍图片到本地
+//        if (null != alarmPicture) {
+//            String originalFilename = alarmPicture.getOriginalFilename();
+//            String suffix = "";
+//            int beginIndex = originalFilename.lastIndexOf(".");
+//            if (beginIndex > 0) {
+//                suffix = originalFilename.substring(beginIndex);
+//            }
+//            String filename = UUID.randomUUID().toString() + suffix;
+//            File dest = new File(path, filename);
+//            try {
+//                alarmPicture.transferTo(dest);
+//            } catch (IOException e) {
+//                log.info("file IOException is {}", e);
+//            }
+//        }
         Map<String, String> map = new HashMap<>();
-        if(deviceEvent.getDevType().equals("EBike")){
-            deviceEvent.setDevType("电动车入电梯报警");
-            map.put("serialNum", deviceEvent.getSerialNum());
-            map.put("alarmType", deviceEvent.getEventType());
-            map.put("alarmTime", deviceEvent.getLocalTime());
-            OkHttpUtils.doPostFile(serverPort + "/camera/alarm", null, map, "alarmPicture", alarmPicture);
-
+        if (!isSameMap.containsKey(deviceEvent.getSerialNum())) {
+            if (deviceEvent.getDevType().equals("EBike")) {
+                isSameMap.put(deviceEvent.getSerialNum(), LocalDateTime.now());
+                map.put("serialNum", deviceEvent.getSerialNum());
+                map.put("alarmType", "eBike");
+                map.put("alarmTime", deviceEvent.getLocalTime());
+                OkHttpUtils.doPostFile(serverPort + "/camera/alarm", null, map, "alarmPicture", alarmPicture);
+            }
         }
-
-
+        isSameMap.put(deviceEvent.getSerialNum(), LocalDateTime.now());
         ResponseInfo responseInfo = new ResponseInfo();
         responseInfo.setReturnCode(0);
         JsonStreamUtil.getResponsePrintWriter(responseInfo, response);

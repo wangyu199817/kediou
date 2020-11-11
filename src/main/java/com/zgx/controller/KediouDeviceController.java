@@ -79,6 +79,7 @@ public class KediouDeviceController implements IBaseController {
     public void  getHeartBeat(MonitorAlarm monitorAlarm) {
         log.info("serialNum is {}", monitorAlarm.getSerialNum());
         log.info("heartSendTime is {}", monitorAlarm.getHeartSendTime());
+        log.info("设备是否上线 0-下线，1上线："+monitorAlarm.getIsOnline());
     }
 
 

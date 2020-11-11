@@ -23,4 +23,7 @@ public class MonitorAlarm {
 
     //报警时间
     private String alarmTime;
+
+    //设备是否离线
+    private String isOnline;
 }
