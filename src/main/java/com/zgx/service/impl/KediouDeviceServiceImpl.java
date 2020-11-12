@@ -9,6 +9,7 @@ import com.zgx.model.Heartbeat;
 import com.zgx.model.ResponseInfo;
 import com.zgx.service.IKediouDeviceService;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.ResponseBody;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,20 +57,25 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
         String requestStringFromJson = JsonStreamUtil.getRequestStringFromJson(request);
         JSONObject requestJson = JSONObject.parseObject(requestStringFromJson);
         Heartbeat heartbeat = requestJson.toJavaObject(Heartbeat.class);
-        heartbeat.setLocalTime(TimetransUtil.getDateStrFromISO8601Timestamp(heartbeat.getLocalTime()));
+//        heartbeat.setLocalTime(TimetransUtil.getDateStrFromISO8601Timestamp(heartbeat.getLocalTime()));
+        heartbeat.setLocalTime(TimetransUtil.getLocalDateStrFromISO8601Timestamp(heartbeat.getLocalTime()));
+        log.info("网关接收的heartbeat为 {}", heartbeat);
+        log.info("时间 is " + LocalDateTime.now());
+
         Map<String, String> params = new HashMap<>();
         //判断摄像头的序列号是够存在 Map  isOnLineMap<K,V>中，若存在则说明设备已经上线了，只更新V的时间，不存在则发送上线通知到平台
         if (!isOnLineMap.containsKey(heartbeat.getSerialNum())) {
             isOnLineMap.put(heartbeat.getSerialNum(), LocalDateTime.now());
-            params.put("serialNum", heartbeat.getSerialNum());
-            params.put("heartSendTime", heartbeat.getLocalTime());
-            params.put("isOnline", "1");
-            OkHttpUtils.doPost(serverPort + "/camera/online", params, null);
+            params.put("mark", heartbeat.getSerialNum());
+            params.put("alarmTimes", heartbeat.getLocalTime());
+            params.put("isOnline", String.valueOf(1));
+
+            ResponseBody responseBody = OkHttpUtils.doPost(serverPort + "/camera/online", params, null);
+            log.info("ResponseBody - > {}", OkHttpUtils.resonse2String(responseBody));
+            log.info("发送心跳到平台");
         }
         //接收设备心跳后根据设备心跳传来的序列号 即通过K更新V的时间， 以便后续判断设备是否离线
         isOnLineMap.put(heartbeat.getSerialNum(), LocalDateTime.now());
-        log.info("存设备于map：" + isOnLineMap);
-        log.info(" heartbeat is {}", heartbeat);
         ResponseInfo responseInfo = new ResponseInfo();
         responseInfo.setReturnCode(0);
         responseInfo.setReturnStr("正确");
@@ -82,10 +88,9 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
     @Override
     public void DeviceEndianEvent(MultipartFile EventInfo, MultipartFile alarmPicture) {
         String EventInfoStr = JsonStreamUtil.readFiletoString(EventInfo);
-//        log.info("EventInfoStr is {}", EventInfoStr);
         DeviceEvent deviceEvent = JSONObject.parseObject(EventInfoStr, DeviceEvent.class);
         deviceEvent.setLocalTime(TimetransUtil.getDateStrFromISO8601Timestamp(deviceEvent.getLocalTime()));
-        log.info("DeviceEndianEvent deviceEvent is {}", deviceEvent);
+        log.info("网关接收的DeviceEndianEvent deviceEvent is {}", deviceEvent);
         //保存告警摄像头抓拍图片到本地
 //        if (null != alarmPicture) {
 //            String originalFilename = alarmPicture.getOriginalFilename();
@@ -106,10 +111,12 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
         if (!isSameMap.containsKey(deviceEvent.getSerialNum())) {
             if (deviceEvent.getDevType().equals("EBike")) {
                 isSameMap.put(deviceEvent.getSerialNum(), LocalDateTime.now());
-                map.put("serialNum", deviceEvent.getSerialNum());
+                map.put("mark", deviceEvent.getSerialNum());
                 map.put("alarmType", "eBike");
-                map.put("alarmTime", deviceEvent.getLocalTime());
+                map.put("alarmDesc", "警告！电动车违规进入电梯！");
+                map.put("alarmTimes", deviceEvent.getLocalTime());
                 OkHttpUtils.doPostFile(serverPort + "/camera/alarm", null, map, "alarmPicture", alarmPicture);
+                log.info("发送告警到平台");
             }
         }
         isSameMap.put(deviceEvent.getSerialNum(), LocalDateTime.now());
@@ -135,5 +142,6 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
 //        log.info("map is {}", map);
 //        return (MultiValuedMap<String, String>) map;
 //    }
+
 
 }

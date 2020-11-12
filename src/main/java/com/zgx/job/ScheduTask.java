@@ -24,13 +24,13 @@ public class ScheduTask {
     Map<String, String> params = new HashMap<>();
 
     //    @Scheduled(cron = " 0/30 * * * ?")
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 5000)
     public void taskScheduled() {
         if (!isOnLineMap.isEmpty()) {
             new HashMap<>(isOnLineMap).forEach((k, v) -> {
                 if (v.plusMinutes(2).isBefore(LocalDateTime.now())) {
 //                if (v.plusSeconds(10).isBefore(LocalDateTime.now())) {
-                    params.put("serialNum",k);
+                    params.put("mark",k);
                     params.put("isOnline", String.valueOf(0));
                     OkHttpUtils.doPost(serverPort + "/camera/online", params, null);
                     log.info("刚下线的摄像头设备序列号为："+k);

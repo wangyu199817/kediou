@@ -1,5 +1,6 @@
 package com.zgx.controller;
 
+import com.zgx.common.util.OkHttpUtils;
 import com.zgx.model.MonitorAlarm;
 import com.zgx.service.IKediouDeviceService;
 import lombok.extern.slf4j.Slf4j;
@@ -10,9 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -23,8 +25,12 @@ import java.util.UUID;
 @Slf4j
 public class KediouDeviceController implements IBaseController {
 
+
     @Resource
     private IKediouDeviceService kediouDeviceService;
+
+    @Value("${operation.server}")
+    public String serverPort;
 
     @Value("${picture.url}")
     private String path;
@@ -48,7 +54,7 @@ public class KediouDeviceController implements IBaseController {
      * @param file      图片文件
      */
     @PostMapping(value = "/DeviceEndianEvent")
-    public void getDeviceEndianEvent(HttpServletRequest request1,MultipartFile EventInfo, MultipartFile file) {
+    public void getDeviceEndianEvent(MultipartFile EventInfo, MultipartFile file) {
         try {
             kediouDeviceService.DeviceEndianEvent(EventInfo, file);
         } catch (Exception e) {
@@ -75,12 +81,25 @@ public class KediouDeviceController implements IBaseController {
             }
         }
     }
+
     @PostMapping("/camera/online")
-    public void  getHeartBeat(MonitorAlarm monitorAlarm) {
-        log.info("serialNum is {}", monitorAlarm.getSerialNum());
-        log.info("heartSendTime is {}", monitorAlarm.getHeartSendTime());
-        log.info("设备是否上线 0-下线，1上线："+monitorAlarm.getIsOnline());
+    public void getHeartBeat(MonitorAlarm monitorAlarm) {
+        log.info("getMark is {}", monitorAlarm.getMark());
+        log.info("getAlarmTime is {}", monitorAlarm.getAlarmTime());
+        log.info("设备是否上线 0-下线，1上线：" + monitorAlarm.getIsOnline());
     }
 
+    //c测试用
+    @PostMapping("/camera/alarms")
+    public void sendAlarmCamera(MonitorAlarm monitorAlarm, MultipartFile alarmPicture) {
+        Map<String, String> map = new HashMap<>();
+        if (monitorAlarm.getAlarmType().equals("EBike")) {
+            map.put("mark", monitorAlarm.getMark());
+            map.put("alarmType", "eBike");
+            map.put("alarmDesc", "警告！电动车违规进入电梯！");
+            map.put("alarmTime", monitorAlarm.getAlarmTime());
+            OkHttpUtils.doPostFile(serverPort + "/camera/alarm", null, map, "alarmPicture", alarmPicture);
+        }
+    }
 
 }

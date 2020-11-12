@@ -13,17 +13,16 @@ import lombok.EqualsAndHashCode;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MonitorAlarm {
     //摄像头编码
-    private String serialNum;
-
-    //心跳发送时间
-    private String heartSendTime;
+    private String mark;
 
     //报警类型
-    private  String alarmType;
+    private String alarmType;
 
-    //报警时间
+    private String alarmDesc;
+
     private String alarmTime;
 
-    //设备是否离线
-    private String isOnline;
+    //设备是否离线 1在线 0离线
+    private Integer isOnline;
+
 }

@@ -21,7 +21,12 @@ public class TimetransUtil {
         DateTimeFormatter dtf1 = DateTimeFormat.forPattern("yyyyMMdd'T'HHmmssZ");
         DateTime dt = dtf1.parseDateTime(timeStr);
         DateTimeFormatter dtf2 = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-
+        return dt.toString(dtf2);
+    }
+    public static String getLocalDateStrFromISO8601Timestamp(String timeStr) {
+        DateTimeFormatter dtf1 = DateTimeFormat.forPattern("yyyyMMdd'T'HHmmssZ");
+        DateTime dt = dtf1.parseDateTime(timeStr);
+        DateTimeFormatter dtf2 = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
         return dt.toString(dtf2);
     }
 
