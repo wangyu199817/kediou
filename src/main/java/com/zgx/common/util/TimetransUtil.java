@@ -67,6 +67,10 @@ public class TimetransUtil {
     public static void main(String[] args) {
         String t = "19961220T003957Z";
         System.out.println("DateUtil.getDateStrFromISO8601Timestamp(t):" + TimetransUtil.getDateStrFromISO8601Timestamp(t));
+        String localdateStr=TimetransUtil.getDateStrFromISO8601Timestamp(t);
+        System.out.println("DateUtil.getLocalDateStrFromISO8601Timestamp(t):" + TimetransUtil.getLocalDateStrFromISO8601Timestamp(t));
+//        LocalDateTime localDateTime= LocalDateTime.parse(localdateStr);
+//        System.out.println("localDateTime="+localDateTime);
         System.out.println("localdatetime:" + LocalDateTime.now());
         String s = TimetransUtil.getISO8601TimestampFromDate(LocalDateTime.now());
         System.out.println("getISO8601TimestampFromDate:" + s);

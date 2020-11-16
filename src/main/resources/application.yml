@@ -2,11 +2,13 @@ server:
   port: 8099
 
 operation:
-  server: http://192.168.1.2:8067
+  server: http://192.168.1.250:8084/api/openapi
 
 picture:
   url:  d:\\AlarmPicture
 
+
+  secretKey: Zgx123..!
 
 #自定义连接url地址
 #kediou:

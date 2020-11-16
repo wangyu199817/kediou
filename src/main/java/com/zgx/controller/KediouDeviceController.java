@@ -1,6 +1,5 @@
 package com.zgx.controller;
 
-import com.zgx.common.util.OkHttpUtils;
 import com.zgx.model.MonitorAlarm;
 import com.zgx.service.IKediouDeviceService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -81,25 +78,11 @@ public class KediouDeviceController implements IBaseController {
             }
         }
     }
-
     @PostMapping("/camera/online")
     public void getHeartBeat(MonitorAlarm monitorAlarm) {
-        log.info("getMark is {}", monitorAlarm.getMark());
-        log.info("getAlarmTime is {}", monitorAlarm.getAlarmTime());
-        log.info("设备是否上线 0-下线，1上线：" + monitorAlarm.getIsOnline());
-    }
-
-    //c测试用
-    @PostMapping("/camera/alarms")
-    public void sendAlarmCamera(MonitorAlarm monitorAlarm, MultipartFile alarmPicture) {
-        Map<String, String> map = new HashMap<>();
-        if (monitorAlarm.getAlarmType().equals("EBike")) {
-            map.put("mark", monitorAlarm.getMark());
-            map.put("alarmType", "eBike");
-            map.put("alarmDesc", "警告！电动车违规进入电梯！");
-            map.put("alarmTime", monitorAlarm.getAlarmTime());
-            OkHttpUtils.doPostFile(serverPort + "/camera/alarm", null, map, "alarmPicture", alarmPicture);
-        }
+        log.info("摄像头编码 为： {}", monitorAlarm.getMark());
+        log.info("摄像头告警时间 为： {}", monitorAlarm.getAlarmTime());
+        log.info("设备是否上线 0-下线，1上线：{}" + monitorAlarm.getIsOnline());
     }
 
 }
