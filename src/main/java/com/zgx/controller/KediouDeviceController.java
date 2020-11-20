@@ -78,6 +78,7 @@ public class KediouDeviceController implements IBaseController {
             }
         }
     }
+
     @PostMapping("/camera/online")
     public void getHeartBeat(MonitorAlarm monitorAlarm) {
         log.info("摄像头编码 为： {}", monitorAlarm.getMark());

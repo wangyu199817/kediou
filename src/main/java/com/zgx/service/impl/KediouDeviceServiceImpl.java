@@ -44,8 +44,8 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
     @Value("${operation.server}")
     public String serverPort;
 
-    @Value("${secretKey}")
-    public static String secretKey;
+    @Value("${key.secretKey}")
+    public  String secretKey;
 
     //用于存放设备序列号和设备心跳发送时间，方便后续推送平台时上线和下线可以只调用一次接口
     public static Map<String, LocalDateTime> isOnLineMap = new HashMap<>();
@@ -59,11 +59,16 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
      */
     @Override
     public void DeviceEndianHeartbeat() {
-        String requestStringFromJson = JsonStreamUtil.getRequestStringFromJson(request);
-        JSONObject requestJson = JSONObject.parseObject(requestStringFromJson);
-        Heartbeat heartbeat = requestJson.toJavaObject(Heartbeat.class);
-        heartbeat.setLocalTime(TimetransUtil.getLocalDateStrFromISO8601Timestamp(heartbeat.getLocalTime()));
-        log.info("网关接收的heartbeat为 {}", heartbeat);
+//        String requestStringFromJson = JsonStreamUtil.getRequestStringFromJson(request);
+//        JSONObject requestJson = JSONObject.parseObject(requestStringFromJson);
+//        Heartbeat heartbeat = requestJson.toJavaObject(Heartbeat.class);
+//        heartbeat.setLocalTime(TimetransUtil.getLocalDateStrFromISO8601Timestamp(heartbeat.getLocalTime()));
+//        log.info("网关接收的heartbeat为 {}", heartbeat);
+        //测试用
+        Heartbeat heartbeat=new Heartbeat();
+
+        heartbeat.setSerialNum("mark-001");
+        heartbeat.setLocalTime("2020-11-20'T'16:45:00.000");
 
         Map<String, String> params = new HashMap<>();
         //在请求头加"authorization"值进行加密
@@ -98,21 +103,22 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
         DeviceEvent deviceEvent = JSONObject.parseObject(EventInfoStr, DeviceEvent.class);
         deviceEvent.setLocalTime(TimetransUtil.getDateStrFromISO8601Timestamp(deviceEvent.getLocalTime()));
         //测试用
-//            deviceEvent.setLocalTime("2020-11-16T10:25:03.000");
+//        DeviceEvent deviceEvent=new DeviceEvent();
+//            deviceEvent.setLocalTime("2020-11-20 17:59:03");
 //            deviceEvent.setEventType("EBike");
-//            deviceEvent.setSerialNum("123321wy");
+//            deviceEvent.setSerialNum("mark-001");
         log.info("网关接收的DeviceEndianEvent deviceEvent is {}", deviceEvent);
-        Map<String, String> map = new HashMap<>();
         //在请求头加"authorization"值进行加密
         Map<String, String> headers = new HashMap<>();
         headers.put("authorization", Sha256Encode.getSHA256(secretKey));
+        Map<String, String> map = new HashMap<>();
         if (!isSameMap.containsKey(deviceEvent.getSerialNum())) {
             if (deviceEvent.getEventType().equals("EBike")) {
                 isSameMap.put(deviceEvent.getSerialNum(), LocalDateTime.now());
                 map.put("mark", deviceEvent.getSerialNum());
                 map.put("alarmType", "eBike");
                 map.put("alarmDesc", "警告！电动车违规进入电梯！");
-                map.put("alarmTimes", deviceEvent.getLocalTime());
+                map.put("alarmTime", deviceEvent.getLocalTime());
                 OkHttpUtils.doPostFile(serverPort + "/camera/alarm", headers, map, "alarmPicture", alarmPicture);
                 log.info("发送告警到平台");
             }

@@ -7,8 +7,9 @@ operation:
 picture:
   url:  d:\\AlarmPicture
 
-
+key:
   secretKey: Zgx123..!
+
 
 #自定义连接url地址
 #kediou:
