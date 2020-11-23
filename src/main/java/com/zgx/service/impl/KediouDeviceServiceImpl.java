@@ -45,7 +45,7 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
     public String serverPort;
 
     @Value("${key.secretKey}")
-    public  String secretKey;
+    public String secretKey;
 
     //用于存放设备序列号和设备心跳发送时间，方便后续推送平台时上线和下线可以只调用一次接口
     public static Map<String, LocalDateTime> isOnLineMap = new HashMap<>();
@@ -65,7 +65,7 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
 //        heartbeat.setLocalTime(TimetransUtil.getLocalDateStrFromISO8601Timestamp(heartbeat.getLocalTime()));
 //        log.info("网关接收的heartbeat为 {}", heartbeat);
         //测试用
-        Heartbeat heartbeat=new Heartbeat();
+        Heartbeat heartbeat = new Heartbeat();
 
         heartbeat.setSerialNum("mark-001");
         heartbeat.setLocalTime("2020-11-20'T'16:45:00.000");

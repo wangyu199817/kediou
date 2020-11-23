@@ -22,6 +22,7 @@ public interface IBaseController {
 
     /**
      * 返回一个返回码为10000的json
+     *
      * @param data 返回数据
      */
     default JSONObject successJson(Object data) {

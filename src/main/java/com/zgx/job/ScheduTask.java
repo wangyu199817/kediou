@@ -20,7 +20,7 @@ import static com.zgx.service.impl.KediouDeviceServiceImpl.isSameMap;
 public class ScheduTask {
 
     @Value("${operation.server}")
-    public  String serverPort;
+    public String serverPort;
     Map<String, String> params = new HashMap<>();
 
     //    @Scheduled(cron = " 0/30 * * * ?")
@@ -30,19 +30,19 @@ public class ScheduTask {
             new HashMap<>(isOnLineMap).forEach((k, v) -> {
                 if (v.plusMinutes(2).isBefore(LocalDateTime.now())) {
 //                if (v.plusSeconds(20).isBefore(LocalDateTime.now())) {
-                    params.put("mark",k);
+                    params.put("mark", k);
                     params.put("isOnline", String.valueOf(0));
                     OkHttpUtils.doPost(serverPort + "/camera/online", params, null);
-                    log.info("摄像头编号："+k+" 接收不到心跳，发送下线通知！");
+                    log.info("摄像头编号：" + k + " 接收不到心跳，发送下线通知！");
                     isOnLineMap.remove(k);
                 }
             });
         } else {
             log.info("暂无任何离线设备！");
         }
-        if(!isSameMap.isEmpty()){
-            new HashMap<>(isSameMap).forEach((k,v)->{
-                if(v.plusSeconds(20).isBefore(LocalDateTime.now())){
+        if (!isSameMap.isEmpty()) {
+            new HashMap<>(isSameMap).forEach((k, v) -> {
+                if (v.plusSeconds(20).isBefore(LocalDateTime.now())) {
                     isSameMap.remove(k);
                 }
             });
