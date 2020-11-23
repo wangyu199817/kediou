@@ -59,16 +59,16 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
      */
     @Override
     public void DeviceEndianHeartbeat() {
-//        String requestStringFromJson = JsonStreamUtil.getRequestStringFromJson(request);
-//        JSONObject requestJson = JSONObject.parseObject(requestStringFromJson);
-//        Heartbeat heartbeat = requestJson.toJavaObject(Heartbeat.class);
-//        heartbeat.setLocalTime(TimetransUtil.getLocalDateStrFromISO8601Timestamp(heartbeat.getLocalTime()));
-//        log.info("网关接收的heartbeat为 {}", heartbeat);
-        //测试用
-        Heartbeat heartbeat = new Heartbeat();
+        String requestStringFromJson = JsonStreamUtil.getRequestStringFromJson(request);
+        JSONObject requestJson = JSONObject.parseObject(requestStringFromJson);
+        Heartbeat heartbeat = requestJson.toJavaObject(Heartbeat.class);
+        heartbeat.setLocalTime(TimetransUtil.getDateStrFromISO8601Timestamp(heartbeat.getLocalTime()));
+        log.info("网关接收的heartbeat为 {}", heartbeat);
 
-        heartbeat.setSerialNum("mark-001");
-        heartbeat.setLocalTime("2020-11-20'T'16:45:00.000");
+        //测试用
+//        Heartbeat heartbeat = new Heartbeat();
+//        heartbeat.setSerialNum("mark-001");
+//        heartbeat.setLocalTime("2020-11-20'T'16:45:00.000");
 
         Map<String, String> params = new HashMap<>();
         //在请求头加"authorization"值进行加密
@@ -107,6 +107,7 @@ public class KediouDeviceServiceImpl implements IKediouDeviceService {
 //            deviceEvent.setLocalTime("2020-11-20 17:59:03");
 //            deviceEvent.setEventType("EBike");
 //            deviceEvent.setSerialNum("mark-001");
+
         log.info("网关接收的DeviceEndianEvent deviceEvent is {}", deviceEvent);
         //在请求头加"authorization"值进行加密
         Map<String, String> headers = new HashMap<>();
